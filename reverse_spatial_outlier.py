@@ -13,8 +13,8 @@ class MaximumContextOutlier:
     selected_attr = 3
     membership_threshold = 0.5
     epsilon = 0.3
-    set_attr = [0]
-    alpha_attr = [1]
+    set_attr = [0,1,3]
+    alpha_attr = [1,1,1]
 
     def __init__(self,table = None):
         if table == None:
@@ -173,29 +173,28 @@ class MaximumContextOutlier:
         return s
 
     def histogram(self,opt_values):
-
+        pdf = matplotlib.backends.backend_pdf.PdfPages("output.pdf")
         for i in range(len(self.tuple_val_m)):
             attr_m_values = []
             for r in self.table:
                 attr_m_values.append(r[self.set_attr[i]])
-            plt.figure(i)
+            fig=plt.figure(i)
             plt.hist(attr_m_values,bins = 20)
             plt.title("Attribute " + str(self.set_attr[i]) + " Histogram")
             plt.xlabel("Value")
             plt.ylabel("Frequency")
             plt.axvline(x=self.tuple_val_m[i], color='k')
+            pdf.savefig(fig)
         for i in range(len(self.tuple_val_m)):
-            plt.figure(i+len(self.tuple_val_m))
+            fig=plt.figure(i+len(self.tuple_val_m))
             plt.title("Attribute " + str(self.set_attr[i]) + " Membership Function")
             attr_m_values = []
             for r in self.table:
                 attr_m_values.append(r[self.set_attr[i]])
             plt.scatter(attr_m_values,opt_values)
+            pdf.savefig(fig)
 
-        pdf = matplotlib.backends.backend_pdf.PdfPages("output.pdf")
-	for fig in xrange(1, figure().number): ## will open an empty extra figure :(
-    		pdf.savefig( fig )
-	pdf.close()
+        pdf.close()
 
 a = MaximumContextOutlier()
 s=a.run()
