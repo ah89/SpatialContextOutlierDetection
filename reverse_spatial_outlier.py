@@ -1,10 +1,11 @@
 from cvxopt import matrix,solvers
 from random import gauss
 import matplotlib.pyplot as plt
+import matplotlib.backends.backend_pdf
 
 
 class MaximumContextOutlier:
-    number_of_tuple = 10000
+    number_of_tuple = 100
     num_of_attr = 5
     num_of_InEq = 2 * number_of_tuple
     alpha = 0.5
@@ -162,12 +163,13 @@ class MaximumContextOutlier:
     def run(self):
 
         s = self.solv()
-        print list(s['x'])
+#        print list(s['x'])
         membership_score=[]
         for score in list(s['x']):
             membership_score.append(1-score)
-        # self.histogram(membership_score)
-        print membership_score
+        self.histogram(membership_score)
+	#print 
+        #print membership_score
         return s
 
     def histogram(self,opt_values):
@@ -190,7 +192,10 @@ class MaximumContextOutlier:
                 attr_m_values.append(r[self.set_attr[i]])
             plt.scatter(attr_m_values,opt_values)
 
-        plt.show()
+        pdf = matplotlib.backends.backend_pdf.PdfPages("output.pdf")
+	for fig in xrange(1, figure().number): ## will open an empty extra figure :(
+    		pdf.savefig( fig )
+	pdf.close()
 
 a = MaximumContextOutlier()
 s=a.run()
