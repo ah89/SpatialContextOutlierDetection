@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 class SetOutlier:
 
-    number_of_tuple = 100
+    number_of_tuple = 1000
 
     num_of_attr = 5
     num_of_InEq = 2 * number_of_tuple

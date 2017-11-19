@@ -168,7 +168,7 @@ class MaximumContextOutlier:
         return h
 
     def solv(self):
-        return solvers.qp(self.p, self.q, self.g, self.h, kktsolver = 'ldl', options = {'kktreg':1e-6})
+        return solvers.qp(self.p, self.q, self.g, self.h, kktsolver = 'chol2', options = {'kktreg':1e-6})
 
 
     def run(self):
