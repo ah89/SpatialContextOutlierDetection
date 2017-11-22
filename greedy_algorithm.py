@@ -6,7 +6,7 @@ import math
 
 
 class GreedyOutlier:
-    number_of_tuple = 10
+    number_of_tuple = 1000
     num_of_attr = 5
     num_of_InEq = 2 * number_of_tuple
     selected_tuple_index = 0
@@ -25,7 +25,10 @@ class GreedyOutlier:
         print self.table
         self.normalize_t()
         self.value()
-
+        val = []
+        for i in self.table:
+            val.append(i[self.set_attr[0]])
+        print val
 
     def normalize_t(self):
 
@@ -130,28 +133,31 @@ class GreedyOutlier:
         return self.current_outlier_score(tmp_list_of_value)
 
     def greedy_strategy(self):
+        pdf = matplotlib.backends.backend_pdf.PdfPages("output.pdf")
         distance_from_given_tuple = []
         self.inclusion = [0] * self.number_of_tuple
-        self.inclusion[self.selected_tuple_index]=1
+        self.inclusion[self.selected_tuple_index] = 1
         for row in range(self.number_of_tuple):
             tmp_dist = 0
-            for attr in range(len(self.set_attr)):
-                tmp_dist += (self.tuple_val_m[attr] - self.table[row][attr]) ** 2
-            distance_from_given_tuple.append(tmp_dist)
+            for attr in self.set_attr:
+                tmp_dist += (self.tuple_val_m[self.set_attr.index(attr)] - self.table[row][attr]) ** 2
+            distance_from_given_tuple.append(math.sqrt(tmp_dist))
         farest_point = distance_from_given_tuple.index(max(distance_from_given_tuple))
         try:
             self.inclusion[farest_point] = 1
         except:
             for far_point in farest_point:
                 self.inclusion[far_point] = 1
+        number_of_try = 1
         while(self.is_more_tuple() != -1):
-            print "This is the inclusion vector: "
-            print self.inclusion
-            print "This is outlier score for this set: "
-            print self.outlier_s()
-
-
-
+            # print "This is the inclusion vector: "
+            # print self.inclusion
+            # print "This is outlier score for this set: "
+            o_score = self.outlier_s()
+            # print o_score
+            self.histogram(pdf, number_of_try, o_score)
+            number_of_try += 1
+        pdf.close()
 
     def is_more_tuple(self):
         isThere = -1
@@ -180,9 +186,34 @@ class GreedyOutlier:
             isThere = 1
         return isThere
 
+    def histogram(self, pdf, number_of_try, outlier_score):
+        for attr in self.set_attr:
+            selected_values = []
+            not_selected_values = []
+            all_value=[]
+            for ind in range(self.number_of_tuple):
+                all_value.append(self.table[ind][attr])
+                if self.inclusion[ind] == 1:
+                    selected_values.append(self.table[ind][attr])
+                else:
+                    not_selected_values.append(self.table[ind][attr])
+            fig = plt.figure(ind)
+            y_selected_values = [1] * sum(self.inclusion)
+            plt.scatter(selected_values, y_selected_values, color='r')
 
+            y_not_selected_values = [0] * len(not_selected_values)
+            plt.scatter(not_selected_values, y_not_selected_values, color='b')
 
+            y_all_values = [0.5] * len(all_value)
+            plt.scatter(all_value, y_all_values, color='c')
 
+            plt.title("The "+str(number_of_try)+"'th try for attribute "+str(attr)+" scatter plot with outlier score "+str(outlier_score))
+            plt.xlabel("Value")
+            plt.ylabel("Frequency")
+            plt.axvline(x=self.tuple_val_m[self.set_attr.index(attr)], color='k')
+            pdf.savefig(fig)
+            plt.draw()
+            plt.pause(0.01)
 
 
 
